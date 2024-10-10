@@ -186,46 +186,39 @@ def rf_model_evaluate(model, features_test, target_test, tree_plot=False, featur
 
 
 
-def logreg_model_evaluate(model, features_test, target_test):
+def logreg_model_evaluate(model, features_test, target_test, posteam):
     """
-    Evaluates the performance of a Logistic Regression model.
+    Evaluates the performance of a Logistic Regression model and returns a DataFrame with actual, predicted labels, 
+    posteam (team on offense), and the probability of winning.
 
     Args:
         model (LogisticRegression): The trained Logistic Regression model.
         features_test (pd.DataFrame): The features for the test set.
         target_test (pd.Series): The true labels for the test set.
+        posteam (pd.Series): The team on offense for each play in the test set.
 
     Raises:
         ValueError: If the model is not trained or if test data is invalid.
     
     Returns:
-        pd.DataFrame: A DataFrame containing the actual labels, predicted labels, and prediction probabilities.
+        pd.DataFrame: A DataFrame containing the posteam, actual labels, predicted labels, and probability of winning.
     """
     
-    # Generate predictions
+    # Generate predictions and predicted probabilities
     y_pred = model.predict(features_test)
-    
-    # Calculate probabilities for each class
-    probabilities = model.predict_proba(features_test)
-
-    # Get the probability of the positive class (assuming binary classification)
-    prob_positive_class = probabilities[:, 1]
+    y_prob = model.predict_proba(features_test)[:, 1]  # Probability of the positive class (team winning)
 
     # Calculate metrics
     accuracy = accuracy_score(target_test, y_pred)
     conf_matrix = confusion_matrix(target_test, y_pred)
     class_report = classification_report(target_test, y_pred)
 
-    # Print evaluation metrics
-    print(f'Accuracy: {accuracy:.4f}')
-    print(f'Confusion Matrix:\n{conf_matrix}')
-    print(f'Classification Report:\n{class_report}')
-
-    # Create a DataFrame to hold the actual and predicted values, and their probabilities
+    # Create a DataFrame with posteam, actual, predicted, and probability columns
     results_df = pd.DataFrame({
-        'Actual': target_test,
-        'Predicted': y_pred,
-        'Probability': prob_positive_class
+        'Posteam': posteam, 
+        'Actual': target_test, 
+        'Predicted': y_pred, 
+        'Probability': y_prob
     })
 
     return results_df
