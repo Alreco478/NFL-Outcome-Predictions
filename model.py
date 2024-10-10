@@ -87,7 +87,7 @@ def optimize_alpha(mode='', features_train=None, target_train=None, features_tes
     df_lasso = pd.DataFrame(columns=['mse', 'r^2'])
     df_ridge = pd.DataFrame(columns=['mse', 'r^2'])
 
-    for i in np.arange(0.01, 0.5, 0.01):
+    for i in np.arange(0.001, 0.5, 0.001):
         if mode in ['lasso', 'both']:
             lasso_model = Lasso(alpha=i)
             lasso_model.fit(features_train, target_train)
