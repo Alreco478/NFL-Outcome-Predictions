@@ -9,6 +9,7 @@ from sklearn.tree import plot_tree
 
 
 
+
 def linreg_evaluate(model, features_test, target_test):
     """
     Tests a linear regression model by calculating performance metrics 
@@ -50,6 +51,7 @@ def linreg_evaluate(model, features_test, target_test):
     print(coef_table)
 
     return
+
 
 
 
@@ -122,6 +124,7 @@ def optimize_alpha(mode='', features_train=None, target_train=None, features_tes
     plt.show()
 
     return
+
 
 
 

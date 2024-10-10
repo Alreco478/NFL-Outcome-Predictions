@@ -9,14 +9,18 @@ import nfl_data_py as nfl
 from explore import summarize_df, check_missing_values
 from transform import filter_to_plays, aggregate_df, add_calc_stats
 from model import linreg_evaluate, optimize_alpha, rf_model_evaluate, logreg_model_evaluate
+from dotenv import load_dotenv
 
 
 
 
-# START MAIN
+
+# load .env file 
+load_dotenv(dotenv_path=r'C:\Users\alrec\Desktop\DATCAP Repo\DAT-Capstone\knobs.env')
 
 # range of years to pull from
-years = list(range(2003, 2024))
+years = os.getenv('YEARS').split(',')
+years = [int(year) for year in years]
 
 # columns to pull from database
 columns =   ['play_id', 'game_id', 'home_team', 'away_team', 'season_type', 'week', 'posteam', 'posteam_type',
@@ -125,12 +129,12 @@ linreg_evaluate(linreg_model, features_test = X_test, target_test = y_test)
 #optimize_alpha(mode='both', features_train=X_train, target_train=y_train, features_test=X_test, target_test=y_test)
 
 # create and evaluate ridge regression model
-ridge_model = Ridge(alpha=.25)
+ridge_model = Ridge(alpha=.05)
 ridge_model.fit(X_train, y_train)
 linreg_evaluate(ridge_model, features_test = X_test, target_test = y_test)
 
 # create and evaluate lasso regression model
-lasso_model = Lasso(alpha=.25)
+lasso_model = Lasso(alpha=.01)
 lasso_model.fit(X_train, y_train)
 linreg_evaluate(lasso_model, features_test = X_test, target_test = y_test)
 
