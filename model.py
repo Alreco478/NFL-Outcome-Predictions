@@ -185,6 +185,7 @@ def rf_model_evaluate(model, features_test, target_test, tree_plot=False, featur
 
 
 
+
 def logreg_model_evaluate(model, features_test, target_test):
     """
     Evaluates the performance of a Logistic Regression model.
@@ -198,11 +199,17 @@ def logreg_model_evaluate(model, features_test, target_test):
         ValueError: If the model is not trained or if test data is invalid.
     
     Returns:
-        pd.DataFrame: A DataFrame containing the actual labels and the predicted labels.
+        pd.DataFrame: A DataFrame containing the actual labels, predicted labels, and prediction probabilities.
     """
     
     # Generate predictions
     y_pred = model.predict(features_test)
+    
+    # Calculate probabilities for each class
+    probabilities = model.predict_proba(features_test)
+
+    # Get the probability of the positive class (assuming binary classification)
+    prob_positive_class = probabilities[:, 1]
 
     # Calculate metrics
     accuracy = accuracy_score(target_test, y_pred)
@@ -214,5 +221,11 @@ def logreg_model_evaluate(model, features_test, target_test):
     print(f'Confusion Matrix:\n{conf_matrix}')
     print(f'Classification Report:\n{class_report}')
 
-    results_df = pd.DataFrame({'Actual': target_test, 'Predicted': y_pred})
+    # Create a DataFrame to hold the actual and predicted values, and their probabilities
+    results_df = pd.DataFrame({
+        'Actual': target_test,
+        'Predicted': y_pred,
+        'Probability': prob_positive_class
+    })
+
     return results_df
