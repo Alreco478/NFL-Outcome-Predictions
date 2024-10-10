@@ -209,7 +209,10 @@ def logreg_model_evaluate(model, features_test, target_test):
     conf_matrix = confusion_matrix(target_test, y_pred)
     class_report = classification_report(target_test, y_pred)
 
+    # Print evaluation metrics
+    print(f'Accuracy: {accuracy:.4f}')
+    print(f'Confusion Matrix:\n{conf_matrix}')
+    print(f'Classification Report:\n{class_report}')
+
     results_df = pd.DataFrame({'Actual': target_test, 'Predicted': y_pred})
     return results_df
-
-    
