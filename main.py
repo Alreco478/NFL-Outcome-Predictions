@@ -9,18 +9,13 @@ import nfl_data_py as nfl
 from explore import summarize_df, check_missing_values
 from transform import filter_to_plays, aggregate_df, add_calc_stats
 from model import linreg_evaluate, optimize_alpha, rf_model_evaluate, logreg_model_evaluate
-from dotenv import load_dotenv
 
 
 
 
-
-# load .env file 
-load_dotenv(dotenv_path=r'C:\Users\alrec\Desktop\DATCAP Repo\DAT-Capstone\knobs.env')
 
 # range of years to pull from
-years = os.getenv('YEARS').split(',')
-years = [int(year) for year in years]
+years = list(range(2003,2023))
 
 # columns to pull from database
 columns =   ['play_id', 'game_id', 'home_team', 'away_team', 'season_type', 'week', 'posteam', 'posteam_type',
