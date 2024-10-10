@@ -28,9 +28,11 @@ def linreg_evaluate(model, features_test, target_test):
     y_pred = model.predict(features_test)
 
     mse = mean_squared_error(target_test, y_pred)
+    rmse = np.sqrt(mse)
     r2 = r2_score(target_test, y_pred)
     
     print(f'Mean Squared Error: {mse:.2f}')
+    print(f"Root Mean Squared Error: {rmse:.2f}")
     print(f'R² Score: {r2:.2f}')
 
     # Get coefficients and feature names
@@ -179,3 +181,35 @@ def rf_model_evaluate(model, features_test, target_test, tree_plot=False, featur
         plt.show()
 
     return
+
+
+
+
+def logreg_model_evaluate(model, features_test, target_test):
+    """
+    Evaluates the performance of a Logistic Regression model.
+
+    Args:
+        model (LogisticRegression): The trained Logistic Regression model.
+        features_test (pd.DataFrame): The features for the test set.
+        target_test (pd.Series): The true labels for the test set.
+
+    Raises:
+        ValueError: If the model is not trained or if test data is invalid.
+    
+    Returns:
+        pd.DataFrame: A DataFrame containing the actual labels and the predicted labels.
+    """
+    
+    # Generate predictions
+    y_pred = model.predict(features_test)
+
+    # Calculate metrics
+    accuracy = accuracy_score(target_test, y_pred)
+    conf_matrix = confusion_matrix(target_test, y_pred)
+    class_report = classification_report(target_test, y_pred)
+
+    results_df = pd.DataFrame({'Actual': target_test, 'Predicted': y_pred})
+    return results_df
+
+    
