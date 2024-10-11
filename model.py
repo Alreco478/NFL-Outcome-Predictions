@@ -189,22 +189,21 @@ def rf_model_evaluate(model, features_test, target_test, tree_plot=False, featur
 
 
 
-def logreg_model_evaluate(model, features_test, target_test, posteam):
+def logreg_model_evaluate(model, features_test, target_test, feature_importance = False):
     """
     Evaluates the performance of a Logistic Regression model and returns a DataFrame with actual, predicted labels, 
-    posteam (team on offense), and the probability of winning.
+    and the probability of winning.
 
     Args:
         model (LogisticRegression): The trained Logistic Regression model.
         features_test (pd.DataFrame): The features for the test set.
         target_test (pd.Series): The true labels for the test set.
-        posteam (pd.Series): The team on offense for each play in the test set.
 
     Raises:
         ValueError: If the model is not trained or if test data is invalid.
     
     Returns:
-        pd.DataFrame: A DataFrame containing the posteam, actual labels, predicted labels, and probability of winning.
+        pd.DataFrame: A DataFrame containing the actual labels, predicted labels, and probability of winning.
     """
     
     # Generate predictions and predicted probabilities
@@ -216,12 +215,30 @@ def logreg_model_evaluate(model, features_test, target_test, posteam):
     conf_matrix = confusion_matrix(target_test, y_pred)
     class_report = classification_report(target_test, y_pred)
 
-    # Create a DataFrame with posteam, actual, predicted, and probability columns
+    # Create a DataFrame with actual, predicted, and probability columns
     results_df = pd.DataFrame({
-        'Posteam': posteam, 
         'Actual': target_test, 
         'Predicted': y_pred, 
         'Probability': y_prob
     })
+
+    if feature_importance:
+        # Get feature names and coefficients
+        feature_names = features_test.columns
+        coefficients = model.coef_[0]
+
+        # Create a DataFrame for coefficients
+        coef_df = pd.DataFrame({'Feature': feature_names, 'Coefficient': coefficients})
+
+        # Calculate the absolute value of coefficients for importance
+        coef_df['Importance'] = np.abs(coef_df['Coefficient'])
+        coef_df = coef_df.sort_values(by='Importance', ascending=False)
+
+        # Plotting
+        plt.figure(figsize=(10, 6))
+        plt.barh(coef_df['Feature'], coef_df['Importance'], color='skyblue')
+        plt.xlabel('Importance')
+        plt.title('Feature Importance from Logistic Regression')
+        plt.show()
 
     return results_df
