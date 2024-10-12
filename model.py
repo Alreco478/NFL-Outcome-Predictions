@@ -189,23 +189,24 @@ def rf_model_evaluate(model, features_test, target_test, tree_plot=False, featur
 
 
 
-def logreg_model_evaluate(model, features_test, target_test, feature_importance = False):
+def logreg_model_evaluate(model, features_test, target_test, feature_importance=False):
     """
-    Evaluates the performance of a Logistic Regression model and returns a DataFrame with actual, predicted labels, 
+    Evaluates the performance of a Logistic Regression model and returns a DataFrame with actual, predicted labels,
     and the probability of winning.
 
     Args:
         model (LogisticRegression): The trained Logistic Regression model.
         features_test (pd.DataFrame): The features for the test set.
         target_test (pd.Series): The true labels for the test set.
+        feature_importance (bool): Whether to display feature importance values and plot. Default is False.
 
     Raises:
         ValueError: If the model is not trained or if test data is invalid.
-    
+
     Returns:
         pd.DataFrame: A DataFrame containing the actual labels, predicted labels, and probability of winning.
     """
-    
+
     # Generate predictions and predicted probabilities
     y_pred = model.predict(features_test)
     y_prob = model.predict_proba(features_test)[:, 1]  # Probability of the positive class (team winning)
@@ -217,8 +218,8 @@ def logreg_model_evaluate(model, features_test, target_test, feature_importance 
 
     # Create a DataFrame with actual, predicted, and probability columns
     results_df = pd.DataFrame({
-        'Actual': target_test, 
-        'Predicted': y_pred, 
+        'Actual': target_test,
+        'Predicted': y_pred,
         'Probability': y_prob
     })
 
@@ -233,6 +234,10 @@ def logreg_model_evaluate(model, features_test, target_test, feature_importance 
         # Calculate the absolute value of coefficients for importance
         coef_df['Importance'] = np.abs(coef_df['Coefficient'])
         coef_df = coef_df.sort_values(by='Importance', ascending=False)
+
+        # Print feature importance values
+        print("\nFeature Importance:")
+        print(coef_df[['Feature', 'Coefficient', 'Importance']])
 
         # Plotting
         plt.figure(figsize=(10, 6))
