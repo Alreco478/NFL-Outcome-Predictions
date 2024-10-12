@@ -5,6 +5,7 @@ import os
 
 
 
+
 def filter_to_plays(df):
     """
     Filters the DataFrame to retain only entries that represent actual plays.
@@ -30,6 +31,7 @@ def filter_to_plays(df):
     df_filtered = df_filtered[~df_filtered['desc'].str.contains(r'Timeout', na=False)]
 
     return df_filtered
+
 
 
 
@@ -67,6 +69,7 @@ def aggregate_df(df, group_by_list, column_func_df):
     aggregated = df.groupby(group_by_list).agg(column_func_df.set_index('Column')['Function']).reset_index()
 
     return aggregated
+
 
 
 

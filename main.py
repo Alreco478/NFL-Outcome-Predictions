@@ -3,19 +3,23 @@ import numpy as np
 import os
 import joblib
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, Lasso, Ridge
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression, Lasso, Ridge, LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 import nfl_data_py as nfl
 from explore import summarize_df, check_missing_values
 from transform import filter_to_plays, aggregate_df, add_calc_stats
-from model import linreg_evaluate, optimize_alpha, rf_model_evaluate
+from model import linreg_evaluate, optimize_alpha, rf_model_evaluate, logreg_model_evaluate
+from predict import predict_winner
 
 
 
- 
-# START MAIN
 
-years = list(range(2003, 2024))
+
+# range of years to pull from (2003-2023)
+years = list(range(2003,2024))
+
+# columns to pull from database
 columns =   ['play_id', 'game_id', 'home_team', 'away_team', 'season_type', 'week', 'posteam', 'posteam_type',
              'side_of_field', 'yardline_100', 'game_date', 'game_seconds_remaining', 'down', 'ydsnet', 'desc',
              'play_type', 'yards_gained', 'pass_length', 'yards_after_catch', 'field_goal_result', 
@@ -35,21 +39,29 @@ columns =   ['play_id', 'game_id', 'home_team', 'away_team', 'season_type', 'wee
              'drive_inside20', 'drive_ended_with_score', 'away_score', 'home_score', 'location', 
              'result', 'total', 'spread_line', 'total_line', 'surface', 'temp', 'wind', 'pass', 
              'rush', 'first_down', 'special', 'play', 'qb_epa']
+
+# create df with combined data
 df = nfl.import_pbp_data(years, columns, downcast=True)
 
+# display first n rows, number of rows, number of columns, number of duplicates
 summarize_df(df, display_rows=10)
 
+# display how many nans are in each column (check_missing_values returns df of missing values)
 check_missing_values(df, display_rows=500)
 
+# filter df to only include plays (gets rid of timeouts, penalties, start of game, etc.)
 filtered_df = filter_to_plays(df)
 
-encoded_df = pd.get_dummies(filtered_df, columns=['field_goal_result',
-                                                  'extra_point_result',
-                                                  'two_point_conv_result'], 
-                                         drop_first=True)
+# use one hot encoding on the listed columns
+columns_to_encode = ['field_goal_result',
+                     'extra_point_result',
+                     'two_point_conv_result']
+encoded_df = pd.get_dummies(filtered_df, columns=columns_to_encode, drop_first=True)
 
+# columns to group by in aggregate_df
 group_by = ['game_id', 'posteam', 'home_team', 'away_team']
 
+# dict of columns to be included in aggregated_df and the corresponding functions to be applied
 column_functions = {'yards_gained': 'sum',
                     'receiving_yards': 'sum',
                     'rushing_yards': 'sum',
@@ -79,40 +91,119 @@ column_functions = {'yards_gained': 'sum',
                     'total_away_score': 'max',
                     'total': 'max'}
 
+# turn column_functions into a df
 df_column_functions = pd.DataFrame(list(column_functions.items()), columns=['Column', 'Function'])
 
+# create aggregated_df
 aggregated_df = aggregate_df(encoded_df, group_by, df_column_functions)
 
+# add calculated stats columns (win, season, yards_per_play_offense, points_per_play_offense, 
+#                               first_down_rate_offense, turnovers_lost, yards_per_play_allowed, 
+#                               points_per_play_allowed, first_down_rate_allowed, turnovers_gained,
+#                               turnover_differential, fg percentage, xp percentage)
 transformed_df = add_calc_stats(aggregated_df, encoded_df)
 
-features = ['yards_per_play_offense', 'points_per_play_offense', 'first_down_rate_offense', 
-            'turnovers_lost', 'yards_per_play_allowed', 'points_per_play_allowed', 
-            'first_down_rate_allowed', 'turnovers_gained', 'turnover_differential']
+# select features to be used in models
+features = ['yards_per_play_offense', 'first_down_rate_offense', 'yards_per_play_allowed', 
+            'first_down_rate_allowed', 'turnover_differential']
+# select target_variable
 target_variable = 'win'
 
+# create X (df of feature columns) and y (series for the target variable)
 X = transformed_df[features]
 y = transformed_df[target_variable]
     
+# split into train and test
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# create and evaluate linear regression model
 linreg_model = LinearRegression()
 linreg_model.fit(X_train, y_train)
 linreg_evaluate(linreg_model, features_test = X_test, target_test = y_test)
 
+# plot the relationship between alpha and r^2/mse for ridge and lasso models to determine alpha
 #optimize_alpha(mode='both', features_train=X_train, target_train=y_train, features_test=X_test, target_test=y_test)
 
-ridge_model = Ridge(alpha=.25)
+# create and evaluate ridge regression model
+ridge_model = Ridge(alpha=.05)
 ridge_model.fit(X_train, y_train)
 linreg_evaluate(ridge_model, features_test = X_test, target_test = y_test)
 
-lasso_model = Lasso(alpha=.25)
+# create and evaluate lasso regression model
+lasso_model = Lasso(alpha=.01)
 lasso_model.fit(X_train, y_train)
 linreg_evaluate(lasso_model, features_test = X_test, target_test = y_test)
 
+# create and evaluate random forest model
 rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
 rf_model.fit(X_train, y_train)
 rf_model_evaluate(rf_model, features_test=X_test, target_test=y_test, tree_plot=False, feature_importance=False)
 
+# create and evaluate logistic regression model
+logreg_model = LogisticRegression()
+logreg_model.fit(X_train, y_train)
+print(logreg_model_evaluate(logreg_model, X_test, y_test).head(10))
+
+
+
+
+
+
+
+# load 2024 play by play
+df_2024 = nfl.import_pbp_data([2024], columns, downcast=True)
+
+# create filtered_df_2024
+filtered_df_2024 = filter_to_plays(df_2024)
+
+# create encoded_df_2024
+encoded_df_2024 = pd.get_dummies(filtered_df_2024, columns=columns_to_encode, drop_first=True)
+
+# create aggregated_df_2024
+aggregated_df_2024 = aggregate_df(encoded_df_2024, group_by, df_column_functions)
+
+# create transformed_df_2024
+transformed_df_2024 = add_calc_stats(aggregated_df_2024, encoded_df_2024)
+
+# column functions parameter for aggregate_df the second time
+column_functions = {'turnover_differential': 'mean',
+                    'first_down_rate_allowed': 'mean',
+                    'first_down_rate_offense': 'mean',
+                    'yards_per_play_allowed': 'mean',
+                    'yards_per_play_offense': 'mean'}
+df_column_functions = pd.DataFrame(list(column_functions.items()), columns=['Column', 'Function'])
+
+# aggregate season_team_df
+season_team_df_2024 = aggregate_df(transformed_df_2024, ['posteam'], df_column_functions)
+
+# identify features in season_team_df_2024
+features = season_team_df_2024[['yards_per_play_offense', 'first_down_rate_offense', 'yards_per_play_allowed', 
+                                'first_down_rate_allowed', 'turnover_differential']]
+
+# scale features
+scaler = StandardScaler()
+scaled_features = scaler.fit_transform(features)
+
+# create scaled_df_2024
+scaled_df_2024 = pd.DataFrame(scaled_features, columns=features.columns)
+scaled_df_2024['posteam'] = season_team_df_2024['posteam']
+scaled_df_2024 = scaled_df_2024.reset_index(drop=True)
+
+#scaled_df_2024.to_csv(os.path.join(filepath, 'scaled_df_2024.csv'))
+
+# predict the winner of an nfl game
+predicted_winner, winning_probability = predict_winner(logreg_model, scaled_df_2024, 'SF', 'SEA')
+print(f"Predicted Winner: {predicted_winner}, Probability: {winning_probability:.2f}%")
+
+
+
+
+
+
+
+
+
+# download any models or datasets
 print("Would you like to save any files from the project? (y/n)")
 i = input("")
 if i in {'Y','y', 'ex'}:
