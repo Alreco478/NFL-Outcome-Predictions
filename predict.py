@@ -12,7 +12,7 @@ def predict_winner(model, df, home_team, away_team):
 
     Args:
         model (LogisticRegression): The model to use for the predictions.
-        scaled_df (pd.DataFrame): The DataFrame containing scaled features for each team with a 'posteam' column.
+        df (pd.DataFrame): The DataFrame containing scaled features for each team with a 'posteam' column.
         home_team (str): The name of the home team.
         away_team (str): The name of the away team.
 
