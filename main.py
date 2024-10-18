@@ -17,7 +17,7 @@ from predict import predict_winner
 
 
 # range of years to pull from (2003-2023)
-years = list(range(2003,2024))
+years = list(range(2013,2024))
 
 # columns to pull from database
 columns =   ['play_id', 'game_id', 'home_team', 'away_team', 'season_type', 'week', 'posteam', 'posteam_type',

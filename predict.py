@@ -34,8 +34,11 @@ def predict_winner(model, df, home_team, away_team):
     home_row = df[df['posteam'] == home_team]
     away_row = df[df['posteam'] == away_team]
     
-    if home_row.empty or away_row.empty:
-        raise ValueError("Both teams must exist in the scaled features DataFrame.")
+    if home_row.empty:
+        raise ValueError(f"home team ({home_row}) must exist in the scaled features DataFrame.")
+    
+    if away_row.empty:
+        raise ValueError(f"away team ({away_row}) must exist in the scaled features DataFrame.")
 
     # Combine the features into a single DataFrame for prediction
     features = pd.DataFrame([home_row.values[0][:-1], away_row.values[0][:-1]], 
@@ -50,3 +53,40 @@ def predict_winner(model, df, home_team, away_team):
     winning_probability = max(probabilities[0][1], probabilities[1][1]) * 100  # Convert to percentage
 
     return predicted_winner, winning_probability
+
+
+
+
+
+def predict_week(logreg_model, scaled_data, games):
+    """
+    Predicts the winner for all NFL games in the given week's schedule.
+
+    Args:
+    - logreg_model: Trained logistic regression model for prediction.
+    - scaled_data: Scaled dataframe containing team stats for prediction.
+    - games: List of tuples where each tuple contains ('Home', 'Away') teams.
+
+    Returns:
+    - predictions_df: DataFrame with columns ['Home', 'Away', 'Predicted Winner', 'Winning Probability']
+    """
+    # Create an empty list to store the predictions
+    predictions = []
+
+    # Iterate over each tuple in the games list
+    for home_team, away_team in games:
+        # Use the provided predict_winner function to make a prediction
+        predicted_winner, winning_probability = predict_winner(logreg_model, scaled_data, home_team, away_team)
+
+        # Append the result to the predictions list
+        predictions.append({
+            'Home': home_team,
+            'Away': away_team,
+            'Predicted Winner': predicted_winner,
+            'Winning Probability (%)': round(winning_probability * 100, 2)
+        })
+
+    # Convert the list of predictions to a DataFrame
+    predictions_df = pd.DataFrame(predictions)
+
+    return predictions_df
