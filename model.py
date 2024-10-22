@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.linear_model import Lasso, Ridge
 from sklearn.tree import plot_tree
 
 

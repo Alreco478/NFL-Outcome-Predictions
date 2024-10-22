@@ -1,18 +1,12 @@
 import pandas as pd
 import numpy as np
-import os
-import joblib
-from sklearn.metrics import mean_squared_error, r2_score, accuracy_score
+from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression, Lasso, Ridge, LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 import nfl_data_py as nfl
-from explore import summarize_df, check_missing_values
 from transform import filter_to_plays, aggregate_df, add_calc_stats
 from model import linreg_evaluate, rf_model_evaluate, logreg_model_evaluate
-from predict import predict_winner
 
 
 
