@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import os
 import joblib
 from sklearn.model_selection import train_test_split
@@ -9,15 +8,16 @@ from sklearn.ensemble import RandomForestClassifier
 import nfl_data_py as nfl
 from explore import summarize_df, check_missing_values
 from transform import filter_to_plays, aggregate_df, add_calc_stats
-from model import linreg_evaluate, optimize_alpha, rf_model_evaluate, logreg_model_evaluate
+from model import linreg_evaluate, rf_model_evaluate, logreg_model_evaluate
 from predict import predict_winner
+from optimize import optimize_year, optimize_alpha
 
 
 
 
 
 # range of years to pull from (2003-2023)
-years = list(range(2003,2024))
+years = list(range(2013,2024))
 
 # columns to pull from database
 columns =   ['play_id', 'game_id', 'home_team', 'away_team', 'season_type', 'week', 'posteam', 'posteam_type',

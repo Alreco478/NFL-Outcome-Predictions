@@ -7,5 +7,12 @@ Files
 - predict.py: functions for making predictions using previously trained models
 - optimize.py: functions for tuning parameters used in prediction models
 
+Installations:
+- pandas for data manipulation
+- scikit-learn for machine learning algorithms and utilities
+- nfl_data_py for collecting nfl data
+
 Instructions for use:
 1. clone repository into folder of your choice
+2. make sure all necessary installations have been performed
+3. run main.py or main.ipynb or create your own file to utilize the functions in other files
