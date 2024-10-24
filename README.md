@@ -9,7 +9,6 @@ Files
 
 Installations:
 - pandas for data manipulation
-- joblib for saving models locally
 - scikit-learn for machine learning algorithms and utilities
 - nfl_data_py for collecting nfl data
 
