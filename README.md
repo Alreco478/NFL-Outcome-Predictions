@@ -16,11 +16,9 @@ The primary goal of this project is to identify the most significant indicators 
 
 
 ##  Project Structure
-├── data/ # Raw and processed datasets  
-├── notebooks/ # Jupyter notebooks for EDA, modeling, etc.  
 ├── models/ # Saved models  
 ├── src/ # Source code  
-├── main.py # Script to run predictions  
+├── main.ipynb # Notebook to run predictions  
 ├── requirements.txt # Python dependencies  
 └── README.md # This file  
 
