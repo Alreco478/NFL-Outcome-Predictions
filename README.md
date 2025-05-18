@@ -18,8 +18,7 @@ The primary goal of this project is to identify the most significant indicators 
 ##  Project Structure
 ├── models/ # Saved models  
 ├── src/ # Source code  
-├── main.ipynb # Notebook to run predictions  
-├── requirements.txt # Python dependencies  
+├── main.ipynb # Notebook to run predictions   
 └── README.md # This file  
 
 ##  Data
