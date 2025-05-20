@@ -18,7 +18,7 @@ The primary goal of this project is to identify the most significant indicators 
 ##  Project Structure
 ├── models/ # Saved models  
 ├── src/ # Source code  
-├── visualizations/ # Visualizations from various steps in the process
+├── visualizations/ # Visualizations from various steps in the process  
 ├── main.ipynb # Notebook to run predictions   
 └── README.md # This file  
 
