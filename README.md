@@ -29,18 +29,9 @@ This project uses the nfl_data_py package
 - The logistic regression model correctly guesses the winner of a game about 82% of the time
 
 ##  Results
-- Key findings from the predictions
-- Charts or graphs for insights (e.g., win probabilities, model confidence)
-- Screenshots or notebook links if applicable
-
-##  Usage
-
-##  Limitations
-- Simplifications and assumptions made
-- Data quality or availability issues
-- Areas where model performance could be improved
+- The most significant variables when determining the winner of an nfl game are the following: Turnover differential, First down percentage (both offense and defense), and Yards per play (both offense and defence)
+- The actual ability of the model to predict nfl outcomes is questionable, however it makes very reasonable predictions based on who has been the better team in the current season.
 
 ##  Potential Improvements
-- Incorporating additional features (weather, injuries, betting lines)
-- Hyperparameter tuning and model optimization
-- Deployment as a live web app or API
+- Factor in home team advantage
+- Test more variables to determine their significance, like penalty yards
